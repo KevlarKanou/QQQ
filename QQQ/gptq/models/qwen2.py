@@ -5,8 +5,8 @@ from transformers.models.qwen2.modeling_qwen2 import (
     Qwen2MLP,
     Qwen2RotaryEmbedding,
     Qwen2Attention,
-    Qwen2FlashAttention2,
-    Qwen2SdpaAttention,
+    # Qwen2FlashAttention2,
+    # Qwen2SdpaAttention,
     Qwen2DecoderLayer,
     Qwen2Model,
     Qwen2ForCausalLM,
@@ -230,39 +230,39 @@ class QuantizedQwen2Attention(Qwen2Attention):
         )
 
 
-class QuantizedQwen2FlashAttention2(Qwen2FlashAttention2, QuantizedQwen2Attention):
-    """
-    Qwen2 flash attention module, following Qwen2 attention module. This module inherits from `Qwen2Attention`
-    as the weights of the module stays untouched. The only required change would be on the forward pass
-    where it needs to correctly call the public API of flash attention and deal with padding tokens
-    in case the input contains any of them. Additionally, for sliding window attention, we apply SWA only to the bottom
-    config.max_window_layers layers.
-    """
+# class QuantizedQwen2FlashAttention2(Qwen2FlashAttention2, QuantizedQwen2Attention):
+#     """
+#     Qwen2 flash attention module, following Qwen2 attention module. This module inherits from `Qwen2Attention`
+#     as the weights of the module stays untouched. The only required change would be on the forward pass
+#     where it needs to correctly call the public API of flash attention and deal with padding tokens
+#     in case the input contains any of them. Additionally, for sliding window attention, we apply SWA only to the bottom
+#     config.max_window_layers layers.
+#     """
 
-    def __init__(self, *args, **kwargs):
-        QuantizedQwen2Attention.__init__(self, *args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         QuantizedQwen2Attention.__init__(self, *args, **kwargs)
 
-        # TODO: Should be removed once Flash Attention for RoCm is bumped to 2.1.
-        # flash_attn<2.1 generates top-left aligned causal mask, while what is needed here is bottom-right alignement, that was made default for flash_attn>=2.1. This attribute is used to handle this difference. Reference: https://github.com/Dao-AILab/flash-attention/releases/tag/v2.1.0.
-        # Beware that with flash_attn<2.1, using q_seqlen != k_seqlen (except for the case q_seqlen == 1) produces a wrong mask (top-left).
-        self._flash_attn_uses_top_left_mask = not is_flash_attn_greater_or_equal_2_10()
+#         # TODO: Should be removed once Flash Attention for RoCm is bumped to 2.1.
+#         # flash_attn<2.1 generates top-left aligned causal mask, while what is needed here is bottom-right alignement, that was made default for flash_attn>=2.1. This attribute is used to handle this difference. Reference: https://github.com/Dao-AILab/flash-attention/releases/tag/v2.1.0.
+#         # Beware that with flash_attn<2.1, using q_seqlen != k_seqlen (except for the case q_seqlen == 1) produces a wrong mask (top-left).
+#         self._flash_attn_uses_top_left_mask = not is_flash_attn_greater_or_equal_2_10()
 
 
-class QuantizedQwen2SdpaAttention(Qwen2SdpaAttention, QuantizedQwen2Attention):
-    """
-    Qwen2 attention module using torch.nn.functional.scaled_dot_product_attention. This module inherits from
-    `Qwen2Attention` as the weights of the module stays untouched. The only changes are on the forward pass to adapt to
-    SDPA API.
-    """
+# class QuantizedQwen2SdpaAttention(Qwen2SdpaAttention, QuantizedQwen2Attention):
+#     """
+#     Qwen2 attention module using torch.nn.functional.scaled_dot_product_attention. This module inherits from
+#     `Qwen2Attention` as the weights of the module stays untouched. The only changes are on the forward pass to adapt to
+#     SDPA API.
+#     """
 
-    def __init__(self, *args, **kwargs):
-        QuantizedQwen2Attention.__init__(self, *args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         QuantizedQwen2Attention.__init__(self, *args, **kwargs)
 
 
 QUANT_QWEN2_ATTENTION_CLASSES = {
     "eager": QuantizedQwen2Attention,
-    "flash_attention_2": QuantizedQwen2FlashAttention2,
-    "sdpa": QuantizedQwen2SdpaAttention,
+    # "flash_attention_2": QuantizedQwen2FlashAttention2,
+    # "sdpa": QuantizedQwen2SdpaAttention,
 }
 
 

@@ -1,6 +1,6 @@
-transformers==4.45.0
-datasets==2.16.1
+transformers>=4.53.0
+datasets>=2.16.1
 easydict
 accelerate
 zstandard
-lm_eval==0.4.2
+lm_eval>=0.4.2
